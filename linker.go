@@ -31,6 +31,11 @@ func (l *Linker) Move(oldpath, newpath string) error {
 		return err
 	}
 
+	if dry {
+		l.outputer.OutVerbose("  would %s backup %s to %s", Green("→"), Brown(oldpath), Brown(newpath))
+		return nil
+	}
+
 	err = l.os.MkdirAll(path.Dir(newpath), 0700)
 	if err != nil {
 		return err
@@ -43,6 +48,9 @@ func (l *Linker) Move(oldpath, newpath string) error {
 
 // SetSymlink symlinks scrAbs to destAbs.
 func (l *Linker) SetSymlink(srcAbs string, destAbs string) error {
+	if dry {
+		return nil
+	}
 
 	dir := path.Dir(destAbs)
 	if err := l.os.MkdirAll(dir, 0700); err != nil {
@@ -77,6 +85,11 @@ func (l *Linker) NeedSymlink(src, dest string) (bool, error) {
 	}
 
 	// here dest is a wrong symlink
+
+	if dry {
+		l.outputer.OutInfo("  %s would delete wrong symlink %s", Green("✓"), Brown(dest))
+		return true, nil
+	}
 
 	if err = l.os.Remove(dest); err != nil {
 		return false, err

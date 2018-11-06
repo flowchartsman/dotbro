@@ -17,6 +17,7 @@ import (
 type Configuration struct {
 	Directories Directories
 	Mapping     map[string]string
+	Init        map[string][]string
 	Files       Files
 	Filepath    string
 }
@@ -42,19 +43,20 @@ func NewConfiguration(filename string) (conf *Configuration, err error) {
 	case ".json":
 		conf, err = fromJSON(filename)
 	default:
-		err = fmt.Errorf("Cannot read config file %s : unknown extension. Supported: conf, toml.", filename)
+		err = fmt.Errorf("Cannot read config file %s : unknown extension. Supported: json, toml.", filename)
 	}
 
 	if err != nil {
 		return nil, err
 	}
+
+	conf.Filepath = filename
 
 	conf, err = processConf(conf)
 	if err != nil {
 		return nil, err
 	}
 
-	conf.Filepath = filename
 	return conf, nil
 }
 

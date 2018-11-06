@@ -9,15 +9,19 @@ func ParseArguments(argv []string) (map[string]interface{}, error) {
 	usage := `dotbro - simple yet effective dotfiles manager.
 
 Usage:
-  dotbro [options] [--config=<filepath>]
+  dotbro [options]
+  dotbro init [options]
   dotbro add [options] <filename>
   dotbro -h | --help
   dotbro --version
 
 Common options:
   -c --config=<filepath>  Dotbro's configuration file in JSON or TOML format.
+						  [default: dotbro.toml]
   -q --quiet              Quiet mode. Do not print any output, except warnings
                           and errors.
+  -d --dry                Dry mode. Do not take any action, instead print what
+						  WOULD happen (suppresses --quiet).
   -v --verbose            Verbose mode. Detailed output.
 
 Add options:

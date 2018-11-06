@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 
 	. "github.com/logrusorgru/aurora"
 )
@@ -15,7 +16,9 @@ const logFilepath = "${HOME}/.dotbro/dotbro.log"
 var debugLogger DebugLogger
 
 var (
-	osfs = new(OSFS)
+	osfs      = new(OSFS)
+	dry       bool
+	currentOS string
 )
 
 func main() {
@@ -25,6 +28,9 @@ func main() {
 
 	debugLogger.Write("Start.")
 
+	// Get current operating system
+	currentOS = runtime.GOOS
+
 	// Parse arguments
 
 	args, err := ParseArguments(nil)
@@ -33,12 +39,16 @@ func main() {
 		exit(1)
 	}
 
+	if args["--dry"].(bool) {
+		dry = true
+	}
+
 	debugLogger.Write("Arguments passed: %+v", args)
 
 	switch {
 	case args["--verbose"].(bool):
 		outputer.Mode = OutputerModeVerbose
-	case args["--quiet"].(bool):
+	case args["--quiet"].(bool) && !dry:
 		outputer.Mode = OutputerModeQuiet
 	default:
 		outputer.Mode = OutputerModeNormal
@@ -87,6 +97,12 @@ func main() {
 
 		outputer.OutInfo("\nCleaned!")
 		exit(0)
+	case args["init"]:
+		if err = runInitCommands(config, outputer); err != nil {
+			outputer.OutError("%s", err)
+			exit(1)
+		}
+		fallthrough // after init, run installAction
 	default:
 		// Default action: install
 		if err = installAction(config, &outputer); err != nil {
@@ -351,6 +367,10 @@ func installDotfile(src, dest string, linker Linker, config *Configuration, srcD
 		exit(1)
 	}
 
+	if dry {
+		outputer.OutInfo("  %s would symlink %s to %s", Green("→"), Brown(src), Brown(dest))
+		return
+	}
 	outputer.OutInfo("  %s set symlink %s -> %s", Green("+"), Brown(src), Brown(dest))
 }
 
