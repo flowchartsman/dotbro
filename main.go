@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 
 	. "github.com/logrusorgru/aurora"
 )
@@ -16,9 +15,8 @@ const logFilepath = "${HOME}/.dotbro/dotbro.log"
 var debugLogger DebugLogger
 
 var (
-	osfs      = new(OSFS)
-	dry       bool
-	currentOS string
+	osfs = new(OSFS)
+	dry  bool
 )
 
 func main() {
@@ -27,9 +25,6 @@ func main() {
 	outputer.Logger = debugLogger
 
 	debugLogger.Write("Start.")
-
-	// Get current operating system
-	currentOS = runtime.GOOS
 
 	// Parse arguments
 
@@ -99,7 +94,7 @@ func main() {
 		exit(0)
 	case args["init"]:
 		if err = runInitCommands(config, outputer); err != nil {
-			outputer.OutError("%s", err)
+			outputer.OutError("init failed, quitting...")
 			exit(1)
 		}
 		fallthrough // after init, run installAction

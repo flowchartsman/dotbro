@@ -51,6 +51,7 @@ func NewConfiguration(filename string) (conf *Configuration, err error) {
 	}
 
 	conf.Filepath = filename
+	registerCommandMacro("DOTFILEDIR", filename)
 
 	conf, err = processConf(conf)
 	if err != nil {
