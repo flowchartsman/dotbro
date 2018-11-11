@@ -3,6 +3,7 @@ package main
 import (
 	. "github.com/logrusorgru/aurora"
 
+	"fmt"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ func runInitCommands(config *Configuration, outputer Outputer) error {
 				continue
 			}
 			if err := runCommand(command, outputer); err != nil {
-				return err
+				return fmt.Errorf(`error running "%s": %s`, command, err)
 			}
 		}
 	}
